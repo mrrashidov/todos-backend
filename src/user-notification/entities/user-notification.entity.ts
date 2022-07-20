@@ -1,5 +1,5 @@
 import { User } from "src/user/entities/user.entity";
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Timestamp } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class UserNotification {
@@ -14,7 +14,10 @@ export class UserNotification {
      @Column()
      private read: boolean;
 
-     @Column({type: "timestamp"})
-     private readAt: Timestamp;
+     @CreateDateColumn({ 
+          type: 'timestamp', 
+          precision: 3
+        })
+     private readAt: Date;
 
 }
