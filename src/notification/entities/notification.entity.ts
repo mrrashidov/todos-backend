@@ -1,13 +1,13 @@
-import { Column, Entity, PrimaryGeneratedColumn, Timestamp } from "typeorm";
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Notification {
      @PrimaryGeneratedColumn()
      private id: number;
- 
+
      @Column()
      private modelId: number;
-     
+
      @Column()
      private modelType: string;
 
@@ -20,8 +20,10 @@ export class Notification {
      @Column()
      private body: string;
 
-     @Column({type: "timestamp"})
-     private createdAt: Timestamp
-
+     @CreateDateColumn({
+          type: 'timestamp',
+          precision: 3
+     })
+     private createdAt: Date;
 
 }
