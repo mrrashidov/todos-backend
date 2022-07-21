@@ -1,6 +1,7 @@
+import { type } from "os";
 import { Color } from "src/color/entities/color.entity";
 import { User } from "src/user/entities/user.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, Tree, TreeParent } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, Tree, TreeParent } from "typeorm";
 
 
 
@@ -8,29 +9,33 @@ import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGe
 export class Project {
 
     @PrimaryGeneratedColumn()
-    private id: number;
+     id: number;
 
     @Column()
-    private name: string;
+     name: string;
 
     @JoinColumn()
     @ManyToOne(()=> User)
-    private user: User;
+     user: User;
 
     
     @JoinColumn()
     @ManyToOne(()=>Project)
-    private parent: Project;
+     parentProject: Project;
     
 
-    @Column({type: "timestamp"})
-    private createdAt: Timestamp
+     @CreateDateColumn({ 
+        type: 'timestamp', 
+        precision: 3
+      })
+      createdAt: Date;
 
   
     @ManyToMany(() => Color)
     @JoinTable()
-    private color: Color
-    children: any;
+    color: Color
+
+    
 
 
 

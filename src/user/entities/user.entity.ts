@@ -26,5 +26,6 @@ export class User {
      })
     private settings:  JSON;
 
+
 }
 
