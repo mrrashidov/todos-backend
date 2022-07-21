@@ -2,7 +2,7 @@ import { Color } from "src/color/entities/color.entity";
 import { Label } from "src/label/entities/label.entity";
 import { Project } from "src/project/entities/project.entity";
 import { User } from "src/user/entities/user.entity";
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()
 export class Issue {
@@ -27,8 +27,11 @@ export class Issue {
      @Column('text')
      private priority: Priority;
 
-     @Column({type: "timestamp"})
-     private dueDate: Timestamp
+     @CreateDateColumn({ 
+          type: 'timestamp', 
+          precision: 3
+        })
+     dueDate: Date;
 
      @JoinColumn()
      @ManyToOne(() => Project)
@@ -45,8 +48,11 @@ export class Issue {
      private user: User;
 
 
-     @Column({type: "timestamp"})
-     private createdAt: Timestamp
+     @CreateDateColumn({ 
+          type: 'timestamp', 
+          precision: 3
+        })
+     private  createdAt: Date;
 
      
      @ManyToMany(() => Label)
