@@ -7,10 +7,10 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export class User {
     
     @PrimaryGeneratedColumn()
-    private id: number;
+     id: number;
 
     @Column()
-    private username: string;
+    username: string;
 
     @Column()
     private email: string;

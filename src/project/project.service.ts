@@ -1,8 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { join } from 'path';
 import { Color } from 'src/color/entities/color.entity';
+import { Team } from 'src/team/entities/team.entity';
 import { User } from 'src/user/entities/user.entity';
-import { Repository, Timestamp } from 'typeorm';
+import { createQueryBuilder, getManager, getRepository, Repository, Timestamp } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
@@ -10,9 +12,6 @@ import { Project } from './entities/project.entity';
 @Injectable()
 export class ProjectService {
 
- 
- 
- 
   constructor(
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
@@ -21,7 +20,10 @@ export class ProjectService {
     private userRepository:Repository<User>,
     
     @InjectRepository(Color)    
-    private colorRepository:Repository<Color>
+    private colorRepository:Repository<Color>,
+    
+    @InjectRepository(Team)    
+    private teamRepository:Repository<Team>
   
   ) { }
 
@@ -58,8 +60,33 @@ if(user1 != null && color != null){
     return pr;
   }
 
-  findAll() {
-    return `This action returns all project`;
+  async findAllByUserId(id1: number) {
+    const user1 = await this.userRepository.findOne({
+      where:{
+        id: id1
+      }
+    })
+  
+ 
+ if(user1 != null){
+
+   const teamProjects = await this.teamRepository
+   .query(`select p.* from team
+   join team_user_users tuu on team.id = tuu."teamId"
+   join team_project_project tpp on team.id = tpp."teamId"
+   join project p on p.id = tpp."projectId"
+where tuu."usersId" = ${user1.id}`)
+
+ const projects = await this.projectRepository
+.query(`select * from project
+left join  team_project_project tpp on project.id = tpp."projectId"
+where project."userId" =  ${user1.id} and tpp."projectId" is null`)
+ return {
+   teamProjects: teamProjects,
+  userprojects: projects
+ }
+ }
+     return "This user doesn't exist";
   }
 
   findOne(id: number) {
