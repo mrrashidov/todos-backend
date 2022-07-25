@@ -2,10 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
-import { ConfigModule } from '@nestjs/config';
-import * as Joi from 'joi';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import * as typeorm from 'typeorm';
 import { ColorModule } from './color/color.module';
 import { ProjectModule } from './project/project.module';
 import { IssueModule } from './issue/issue.module';
@@ -24,7 +22,7 @@ import { UserNotificationModule } from './user-notification/user-notification.mo
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'root123',
+      password: '1111',
       database: 'ToDo',
       autoLoadEntities:true,
       synchronize: true,
@@ -44,5 +42,5 @@ import { UserNotificationModule } from './user-notification/user-notification.mo
   providers: [AppService],
 })
 export class AppModule {
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: typeorm.DataSource) {}
 }
