@@ -1,10 +1,26 @@
-import { IsNotEmpty } from "class-validator";
+import { ApiProperty } from "@nestjs/swagger";
+import { IsString } from "class-validator";
+import { LoginDto } from "./update-user.dto";
 
-export class CreateUserDto {
-    @IsNotEmpty()
-    firstName: string;
-    lastName: string;
-    isActive: boolean
+
+
+
+export  class CreatedUserDto extends LoginDto {
+
+  @ApiProperty()
+  @IsString()
+  username: string;
+
+
 }
 
-export default CreateUserDto;
+
+export interface UserResponse {
+  id: number;
+  username: string;
+  email: string;
+  password?:string;
+  avatar:string | null;
+}
+
+
