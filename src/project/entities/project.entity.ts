@@ -2,6 +2,7 @@ import { type } from "os";
 import { Color } from "src/color/entities/color.entity";
 import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, Tree, TreeParent } from "typeorm";
+import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
 
 
@@ -31,10 +32,11 @@ export class Project {
       createdAt: Date;
 
   
-    @ManyToMany(() => Color)
-    @JoinTable()
+    
+      @JoinColumn()
+      @ManyToOne(()=>Color)
     color: Color
-
+  
     
 
 
