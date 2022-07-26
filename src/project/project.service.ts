@@ -60,17 +60,17 @@ if(user1 != null && color != null){
     return pr;
   }
 
-  async findAllByUserId(id1: number) {
-    const user1 = await this.userRepository.findOne({
-      where:{
-        id: id1
-      }
-    })
-  
- 
- if(user1 != null){
 
-   const teamProjects = await this.teamRepository
+
+
+
+  async findAllByUserId(id1: number) {
+
+    const user1 = await this.userRepository.findOneBy({ id: id1  })
+
+    if(user1 != null){
+ 
+    const teamProjects = await this.teamRepository
    .query(`select p.* from team
    join team_user_users tuu on team.id = tuu."teamId"
    join team_project_project tpp on team.id = tpp."teamId"
@@ -79,9 +79,10 @@ where tuu."usersId" = ${user1.id}`)
 
  const projects = await this.projectRepository
 .query(`select * from project
-left join  team_project_project tpp on project.id = tpp."projectId"
+left join  team_project_project tpp on project.id = tpp."projectId" 
 where project."userId" =  ${user1.id} and tpp."projectId" is null`)
- return {
+   
+return {
    teamProjects: teamProjects,
   userprojects: projects
  }
@@ -89,13 +90,29 @@ where project."userId" =  ${user1.id} and tpp."projectId" is null`)
      return "This user doesn't exist";
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
+
+
+
+
+
+  async update(id: number, updateProjectDto: UpdateProjectDto) {
+    const project = await this.projectRepository.findOneBy({ id: id  })
+    
+    const color = await this.colorRepository.findOne({where:{
+     id: updateProjectDto.colorId }});
+    
+     project.color = color;
+     project.name = updateProjectDto.name
+     
+     console.log(project)
+    
+    await this.projectRepository.save(project)
+    
+
+    return project;
   }
 
-  update(id: number, updateProjectDto: UpdateProjectDto) {
-    return `This action updates a #${id} project`;
-  }
+
 
   remove(id: number) {
     return `This action removes a #${id} project`;

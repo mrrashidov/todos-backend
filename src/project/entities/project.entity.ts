@@ -32,10 +32,11 @@ export class Project {
       createdAt: Date;
 
   
-    @ManyToMany(() => Color)
-    @JoinTable()
+    
+      @JoinColumn()
+      @ManyToOne(()=>Color)
     color: Color
-
+  
     
 
 
