@@ -1,8 +1,8 @@
 import { type } from "os";
 import { Color } from "src/color/entities/color.entity";
+import { Team } from "src/team/entities/team.entity";
 import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, Tree, TreeParent } from "typeorm";
-import { SnakeNamingStrategy } from "typeorm-naming-strategies";
 
 
 
@@ -35,10 +35,14 @@ export class Project {
     
       @JoinColumn()
       @ManyToOne(()=>Color)
-    color: Color
-  
+      color: Color
+   
+   @Column({
+    default:  false
+   })
+      isDelete: boolean
     
 
-
+ 
 
 }

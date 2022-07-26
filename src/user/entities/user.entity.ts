@@ -12,18 +12,18 @@ export class User {
     username: string;
 
     @Column()
-    private email: string;
+     email: string;
   
     @Column({ default: true })
-    private avatar: string;
+     avatar: string;
 
     @Column()
-     private password: string
+      password: string
 
      @Column({
         type : "jsonb"
      })
-    private settings:  JSON;
+     settings:  JSON;
 
 
 }

@@ -1,11 +1,12 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsNotEmpty } from 'class-validator';
+import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 import { CreateProjectDto } from './create-project.dto';
 
 export class UpdateProjectDto  {
 
-     @IsNotEmpty()
+     @IsString()
      name: string;
 
+     @IsInt()
      colorId: number
 }

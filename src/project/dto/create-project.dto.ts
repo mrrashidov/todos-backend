@@ -1,16 +1,16 @@
-import { IsInt, IsNotEmpty } from "class-validator";
+import { IsInt, IsNotEmpty, IsString } from "class-validator";
 import { Timestamp } from "typeorm";
 
 export class CreateProjectDto {
 
-     @IsNotEmpty()
+     @IsString()
      name: string;
     
      @IsInt()
      userId: number;
-
+ 
      parentProjectId: number;
-
+     
      colorId: number
 
 }

@@ -23,8 +23,9 @@ export class ProjectController {
     return this.projectService.update(+id, updateProjectDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectService.remove(+id);
+  @Delete()
+  remove(@Query('projectId') projectId: number, @Query('userId') userId: number) {
+    console.log(projectId,userId)
+    return this.projectService.remove(projectId,userId);
   }
 }
