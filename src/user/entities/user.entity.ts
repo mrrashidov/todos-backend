@@ -1,15 +1,8 @@
 
-
 import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-
-
 
 @Entity("users")
 export class User {
- 
-
-
-
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -23,7 +16,7 @@ export class User {
   avatar: string;
 
   @Column({select: false})
-  password: string
+  password: string;
 
   @Column({nullable:true,
     type: "jsonb"
@@ -35,8 +28,5 @@ export class User {
   emailToLowerCase() {
     this.email = this.email.toLowerCase();
   }
-
-
-
 }
 
