@@ -1,4 +1,3 @@
-import { type } from "os";
 import { Color } from "src/color/entities/color.entity";
 import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, Tree, TreeParent } from "typeorm";
@@ -31,12 +30,17 @@ export class Project {
       createdAt: Date;
 
   
-    @ManyToMany(() => Color)
-    @JoinTable()
-    color: Color
-
+    
+      @JoinColumn()
+      @ManyToOne(()=>Color)
+      color: Color
+   
+   @Column({
+    default:  false
+   })
+      isDelete: boolean
     
 
-
+ 
 
 }

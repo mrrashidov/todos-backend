@@ -3,6 +3,7 @@ import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } fr
 
 @Entity("users")
 export class User {
+
   @PrimaryGeneratedColumn()
   id: number;
 
