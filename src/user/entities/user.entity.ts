@@ -6,24 +6,24 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export class User {
     
     @PrimaryGeneratedColumn()
-    private id: number;
+     id: number;
 
     @Column()
-    private username: string;
+    username: string;
 
     @Column()
-    private email: string;
+     email: string;
   
     @Column({ default: true })
-    private avatar: string;
+     avatar: string;
 
     @Column()
-     private password: string
+      password: string
 
      @Column({
         type : "jsonb"
      })
-    private settings:  JSON;
+     settings:  JSON;
 
 
 }

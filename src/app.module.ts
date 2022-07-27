@@ -22,7 +22,7 @@ import { UserNotificationModule } from './user-notification/user-notification.mo
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: '1111',
+      password: 'root123',
       database: 'ToDo',
       autoLoadEntities:true,
       synchronize: true,
