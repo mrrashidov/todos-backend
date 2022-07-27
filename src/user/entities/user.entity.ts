@@ -1,30 +1,33 @@
 
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-
+import { BeforeInsert, BeforeUpdate, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("users")
 export class User {
-    
-    @PrimaryGeneratedColumn()
-     id: number;
 
-    @Column()
-    username: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-     email: string;
-  
-    @Column({ default: true })
-     avatar: string;
+  @Column()
+  username: string;
 
-    @Column()
-      password: string
+  @Column({unique: true})
+  email: string;
 
-     @Column({
-        type : "jsonb"
-     })
-     settings:  JSON;
+  @Column({ default: true })
+  avatar: string;
 
+  @Column({select: false})
+  password: string;
 
+  @Column({nullable:true,
+    type: "jsonb"
+  })
+  settings: JSON;
+
+  @BeforeInsert()
+  @BeforeUpdate()
+  emailToLowerCase() {
+    this.email = this.email.toLowerCase();
+  }
 }
 

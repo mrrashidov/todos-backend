@@ -10,10 +10,8 @@ describe('UserController', () => {
       controllers: [UserController],
       providers: [UserService],
     }).compile();
-
     controller = module.get<UserController>(UserController);
   });
-
   it('should be defined', () => {
     expect(controller).toBeDefined();
   });
