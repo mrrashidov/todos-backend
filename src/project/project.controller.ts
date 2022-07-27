@@ -25,7 +25,6 @@ export class ProjectController {
 
   @Delete()
   remove(@Query('projectId') projectId: number, @Query('userId') userId: number) {
-    console.log(projectId,userId)
     return this.projectService.remove(projectId,userId);
   }
 }

@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { join } from 'path';
 import { Color } from 'src/color/entities/color.entity';
 import { Team } from 'src/team/entities/team.entity';
 import { User } from 'src/user/entities/user.entity';
-import { createQueryBuilder, getManager, getRepository, Repository, Timestamp } from 'typeorm';
+import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
@@ -125,6 +124,6 @@ export class ProjectService {
     }
 
   
-    return "DELATED";
+    return "DELETED";
   }
 }
