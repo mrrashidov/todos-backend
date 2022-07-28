@@ -1,12 +1,15 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString } from "class-validator";
+import { IsInt, IsNotEmpty, IsString } from "class-validator";
 
 export class CreateLabelDto {
 
-    @IsString()
+
     @ApiProperty()
+    @IsNotEmpty()
+    @IsString()
     name: string;
 
     @ApiProperty()
+    @IsInt()
     colorId: number;
 }

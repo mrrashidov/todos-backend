@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { from } from 'rxjs';
 import { Color } from 'src/color/entities/color.entity';
@@ -9,7 +9,6 @@ import { Label } from './entities/label.entity';
 
 @Injectable()
 export class LabelService {
-  
   constructor(
     @InjectRepository(Label)
     private labelRepository: Repository<Label>,
@@ -33,13 +32,31 @@ export class LabelService {
     return from(this.labelRepository.find());
   }
 
-  findOne(id: number) {
-    return from(this.labelRepository.findOne({ where: { id } }));
+  async findLabel(id: number): Promise<Label> {
+    let label: Label;
+    try {
+      label = await this.labelRepository.findOneBy({ id });
+      return label || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  async findOne(id: number) {
+    const label = await this.findLabel(id);
+    if (!label) {
+      throw new NotFoundException('Sorry,we dont have this label.');
+    }
+    return label;
   }
 
   async update(id: number, updateLabelDto: UpdateLabelDto) {
+    const current = await this.findLabel(id);
+    if (!current) {
+      throw new HttpException('Sorry,we dont have this label', HttpStatus.BAD_REQUEST);
+    }
     const [label, color] = await Promise.all([
-      this.labelRepository.findOneBy({ id: id }),
+      this.labelRepository.findOneBy({ id }),
       this.colorRepository.findOne({ where: { id: updateLabelDto.colorId } })
     ])
     label.color = color;
@@ -47,7 +64,11 @@ export class LabelService {
     return from(this.labelRepository.save(label));
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const label = await this.findLabel(id);
+    if (!label) {
+      throw new HttpException('Sorry,we dont have this label', HttpStatus.BAD_REQUEST);
+    }
     return from(this.labelRepository.delete({ id }));
   }
 }
