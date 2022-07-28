@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, HttpCode } from '@nestjs/common';
 import { ColorService } from './color.service';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
@@ -8,6 +8,7 @@ export class ColorController {
   constructor(private readonly colorService: ColorService) {}
 
   @Post()
+  @HttpCode(200)
   create(@Body() createColorDto: CreateColorDto) {
     return this.colorService.create(createColorDto);
   }
@@ -18,17 +19,17 @@ export class ColorController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.colorService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateColorDto: UpdateColorDto) {
-    return this.colorService.update(+id, updateColorDto);
+  @Put()
+  update(@Body() updateColorDto: UpdateColorDto) {
+    return this.colorService.update(updateColorDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.colorService.remove(+id);
   }
 }
