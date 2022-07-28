@@ -4,12 +4,12 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "t
 @Entity()
 export class Label {
      @PrimaryGeneratedColumn()
-     private id: number;
- 
+     id: number;
+
      @Column()
-     private name: string;
+     name: string;
 
      @JoinColumn()
-     @ManyToOne(()=>Color)
-     private color: Color
+     @ManyToOne(() => Color)
+     color: Color
 }
