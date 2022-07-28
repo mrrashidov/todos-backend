@@ -18,6 +18,7 @@ export class UserService {
     return from(this.usersRepository.find());
   }
 
+
   async getUser(id: number): Promise<UserResponse> {
     const user = await this.findUser(id);
     if (!user) {
@@ -43,7 +44,6 @@ export class UserService {
       return null;
     }
   }
-
   updateUser(updateUserDto: UpdateUserDto) {
     const exist = this.findUser(updateUserDto.id);
     if (!exist) {
@@ -51,5 +51,6 @@ export class UserService {
     } else {
       return from(this.usersRepository.update(updateUserDto.id, updateUserDto));
     }
+  }
   }
 }
