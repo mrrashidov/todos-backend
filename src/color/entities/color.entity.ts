@@ -4,13 +4,8 @@ import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 export class Color {
 
     @PrimaryGeneratedColumn()
-    private id: number;
-
+    id: number;
 
     @Column()
-    private name: string;
-
-
-
-  
+    name: string;
 }

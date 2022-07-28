@@ -1,26 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { from} from 'rxjs';
+import { Repository } from 'typeorm/repository/Repository';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
+import { Color } from './entities/color.entity';
 
 @Injectable()
 export class ColorService {
-  create(createColorDto: CreateColorDto) {
-    return 'This action adds a new color';
+  constructor(
+    @InjectRepository(Color)
+    private colorRepository: Repository<Color>
+  ) { }
+
+  async create(createColorDto: CreateColorDto) {
+    const newColor = this.colorRepository.create(createColorDto);
+    await this.colorRepository.save(newColor);
+    return newColor;
   }
 
   findAll() {
-    return `This action returns all color`;
+    return from(this.colorRepository.find());
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} color`;
+  async findOne(id: number) {
+    const color = await this.findColor(id);
+    if(!color){
+      throw new NotFoundException('Sorry , we dont have this color');
+    }
+    return color;
   }
 
-  update(id: number, updateColorDto: UpdateColorDto) {
-    return `This action updates a #${id} color`;
+  async update(updateColorDto: UpdateColorDto) {
+    const color = await this.findColor(updateColorDto.id);
+    if(!color){
+      throw new HttpException('Sorry,we dont have this color', HttpStatus.BAD_REQUEST);
+    }
+    return from(this.colorRepository.update(updateColorDto.id,updateColorDto));
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} color`;
+  async remove(id: number) {
+    const color = await this.findColor(id);
+    if(!color){
+      throw new HttpException('Sorry,we dont have this color', HttpStatus.BAD_REQUEST);
+    }
+    return from(this.colorRepository.delete({ id }));
+  }
+
+  async findColor(id: number): Promise<Color> {
+    let color: Color;
+    try {
+      color = await this.colorRepository.findOneBy({ id });
+      return color || null;
+    } catch (error) {
+      return null;
+    }
   }
 }
