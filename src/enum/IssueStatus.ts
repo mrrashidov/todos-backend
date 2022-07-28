@@ -1,8 +1,6 @@
-enum IssueStatus{
-
-     ACTIVE,
-     DELETE,
-     UPDATE,
-     COMPATED
-
+export enum IssueStatus {
+  ACTIVE,
+  DELETE,
+  UPDATE,
+  COMPATED,
 }
