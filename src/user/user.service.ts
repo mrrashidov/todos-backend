@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { error } from 'console';
 import { catchError, from, map, Observable, switchMap, throwError } from 'rxjs';
 import { AuthService } from 'src/auth/auth.service';
 import { Repository } from 'typeorm';
@@ -72,7 +73,7 @@ export class UserService {
                     const {password, ...result} = user;
                     return result;
                 }),
-                catchError(err => throwError(err))
+                catchError(() => throwError(error))
             )
         })
     )

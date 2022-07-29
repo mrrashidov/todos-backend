@@ -32,9 +32,7 @@ export class UserController {
   @Post()
   createUserForAdmin(@Body() createUser: CreatedUserDto): Observable<UserResponse | Object> {
     return this.userService.createUserForAdmin(createUser).pipe(
-      map((user: UserResponse) => user),
-      catchError(err => of({ error: err.message }))
-    );
+      map((user: UserResponse) => user));
   }
 
   @Get()
