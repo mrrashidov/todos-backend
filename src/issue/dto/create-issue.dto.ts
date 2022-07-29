@@ -1,10 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
+import { Type } from "class-transformer";
+import { IsArray, IsDate, IsEmpty, IsInt, IsNotEmpty, IsString } from "class-validator";
+import { number } from "joi";
 import { Priority } from "src/enum/IssuePriority.enum";
 
 export class CreateIssueDto {
 
-      @ApiProperty() 
+     @ApiProperty() 
+     @IsInt()
      parentIssueId: number;
 
      @ApiProperty() 
@@ -12,7 +15,8 @@ export class CreateIssueDto {
      @IsNotEmpty()
      title: string;
 
-     @ApiProperty() 
+     @ApiProperty()
+     @IsString() 
      description: string;
 
      @ApiProperty() 
@@ -21,9 +25,11 @@ export class CreateIssueDto {
 
      @ApiProperty() 
      @IsNotEmpty()
+     @IsDate()
      dueDate: Date;
 
      @ApiProperty() 
+     @IsInt()
      projectId: number;
 
      @ApiProperty() 
@@ -37,6 +43,8 @@ export class CreateIssueDto {
      userId: number;
 
      @ApiProperty() 
+     @IsArray()
+     @Type(() => number)
      labels: number[]
 
 }

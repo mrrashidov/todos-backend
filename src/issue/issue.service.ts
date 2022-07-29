@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { from, map, Observable, switchMap } from 'rxjs';
 import { Color } from 'src/color/entities/color.entity';
 import { IssueStatus } from 'src/enum/IssueStatus';
 import { Label } from 'src/label/entities/label.entity';
@@ -16,6 +17,7 @@ export class IssueService {
   constructor(
     @InjectRepository(Issue)
     private issueRepository: Repository<Issue>,
+
     @InjectRepository(User)
     private userRepository: Repository<User>,
 
@@ -30,56 +32,88 @@ export class IssueService {
   ) { }
 
 
-  async create(createIssueDto: CreateIssueDto) {
-
-    const issue = await this.issueRepository.create({
+  create(createIssueDto: CreateIssueDto): Observable<string | Issue> {
+    const issue = this.issueRepository.create({
       title: createIssueDto.title,
       dueDate: createIssueDto.dueDate,
       createdAt: new Date(),
+      priority: createIssueDto.priority,
+      status: IssueStatus.ACTIVE
     })
-    if (createIssueDto.parentIssueId != null && createIssueDto.projectId != null) {
-      return "If this issue subIssue then project id must be null"
-    }
     if (createIssueDto.description != null) {
-      issue.description = createIssueDto.description
-    }
+          issue.description = createIssueDto.description
+        }
+    
+    return this.findByColorId(createIssueDto.colorId).pipe(
+      switchMap((color: Color) => {
+        if (color != null) {
+          issue.colors = color
+          if (createIssueDto.labels != null) {
+            return this.findLabelsByIds(createIssueDto.labels).pipe(
+              switchMap((labels: Label[]) => {
+                issue.labels = labels
+                return this.findUserById(createIssueDto.userId).pipe(
+                  switchMap((user: User) => {
+                    issue.user = user
+                    if (createIssueDto.parentIssueId != null && createIssueDto.parentIssueId != null) {
+                       throw new HttpException('One of parent or project id must be null', HttpStatus.BAD_REQUEST);
+                    }
+                    else if (createIssueDto.parentIssueId != null) {
+                      return this.findByIssueId(createIssueDto.parentIssueId).pipe(
+                        switchMap((prIssue: Issue) => {
+                          if (prIssue != null && prIssue.parentIssue == null) {
+                            issue.parentIssue = prIssue
+                            return from(this.issueRepository.save(issue)).pipe(
+                              map((createdIssue: Issue) => {
+                                return createdIssue;
+                              })
+                            )}
+                        })
+                      )
+                    } else if (createIssueDto.projectId != null) {
+                      return this.findByProjectId(createIssueDto.projectId).pipe(
+                        switchMap((project: Project) => {
+                          issue.project = project
+                          return from(this.issueRepository.save(issue)).pipe(
+                            map((createdIssue: Issue) => {
+                              return createdIssue;
+                            }
+                            ))
+                        }))
+                    }
+                  }) )
+              })
+      )}
+        } })
+    ) }
 
-    if (createIssueDto.parentIssueId != null) {
-      const parentIssue = await this.issueRepository.findOne({
-        where: { id: createIssueDto.parentIssueId }, relations: ['parentIssue'],
-      })
 
-      if (parentIssue.parentIssue == null) {
-        issue.parentIssue = parentIssue
-      }
-    }
-    if (createIssueDto.projectId != null) {
-      const project = await this.projectRepository.findOne({ where: { id: createIssueDto.projectId } })
-      issue.project = project
-    }
 
-    if (createIssueDto.labels != null) {
-      const labels = await this.labelRepository.findBy({
-        id: Any(createIssueDto.labels)
-      })
-      if (labels != null) {
-        issue.labels = labels
-      }
-    }
-
-    const [user, color] = await Promise.all([
-      this.userRepository.findOne({ where: { id: createIssueDto.userId } }),
-      this.colorRepository.findOne({ where: { id: createIssueDto.colorId } })  ])
-
-    issue.colors = color
-    issue.user = user
-    issue.priority = createIssueDto.priority
-    issue.status = IssueStatus.ACTIVE
-
-    this.issueRepository.save(issue)
-    return issue;
+  private findUserById(id: number): Observable<User> {
+    return from(this.userRepository.findOneBy({ id }))
   }
 
+  private findLabelsByIds(ids: number[]): Observable<Label[]> {
+    return from(this.labelRepository.findBy({
+      id: Any(ids)
+    }))
+  }
+
+  private findByProjectId(id: number): Observable<Project> {
+    return from(this.projectRepository.findOneBy({ id }))
+  }
+
+  private findByIssueId(id: number): Observable<Issue> {
+    return from(this.issueRepository.findOne({ where: { id }, relations: ['parentIssue'] }));
+
+  }
+
+  private findByColorId(id: number): Observable<Color> {
+    return from(this.colorRepository.findOneBy({ id }));
+  }
+
+  
+  
   findAll() {
     return `This action returns all issue`;
   }
@@ -96,3 +130,7 @@ export class IssueService {
     return `This action removes a #${id} issue`;
   }
 }
+function relations(arg0: { id: number; }, relations: any, arg2: string[]): Promise<Issue> {
+  throw new Error('Function not implemented.');
+}
+
