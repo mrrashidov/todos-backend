@@ -1,4 +1,4 @@
-export interface ColorI{
+export interface ColorResponse{
     id?: number;
     name?: string;
 }
