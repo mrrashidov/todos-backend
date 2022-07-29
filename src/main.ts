@@ -3,17 +3,14 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 
-
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('api');
-  app.useGlobalPipes(new ValidationPipe())
-
+  app.useGlobalPipes(new ValidationPipe());
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle("Todo_ist api")
-    .setDescription("Todo_ist api")
+    .setTitle('Todo_ist api')
+    .setDescription('Todo_ist api')
     .setVersion('1.0.0')
     .build();
 
@@ -23,4 +20,3 @@ async function bootstrap() {
   await app.listen(3000);
 }
 bootstrap();
-
