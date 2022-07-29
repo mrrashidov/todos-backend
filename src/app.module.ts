@@ -16,7 +16,6 @@ import { UserNotificationModule } from './user-notification/user-notification.mo
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 
-
 @Module({
   imports: [
     TypeOrmModule.forRoot({
@@ -45,6 +44,4 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  constructor(private dataSource: typeorm.DataSource) {}
-}
+export class AppModule {}
