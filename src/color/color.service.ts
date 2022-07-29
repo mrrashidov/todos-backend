@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { catchError, from, map, Observable, of, switchMap} from 'rxjs';
 import { Repository } from 'typeorm/repository/Repository';
-import { ColorI } from './dto/color-interface';
+import { ColorResponse } from './dto/color-interface';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
 import { Color } from './entities/color.entity';
@@ -14,35 +14,35 @@ export class ColorService {
     private colorRepository: Repository<Color>
   ) { }
 
-  create(createColorDto: CreateColorDto): Observable<ColorI> {
+  create(createColorDto: CreateColorDto): Observable<ColorResponse> {
     const newColor = this.colorRepository.create(createColorDto);
     return from(this.colorRepository.save(newColor)).pipe(
-      map((color:ColorI)=>{
+      map((color:ColorResponse)=>{
         const{...result}=color;
         return result;
       })      
     );
   }
 
-  findAll(): Observable<ColorI[]> {
+  findAll(): Observable<ColorResponse[]> {
     return from(this.colorRepository.find()).pipe(
-      map((colors: ColorI[]) => {
+      map((colors: ColorResponse[]) => {
         colors.forEach(function (v) { delete v.id });
         return colors;
       })
     );
   }
 
-  findOne(id: number): Observable<ColorI> {
+  findOne(id: number): Observable<ColorResponse> {
     return from(this.findColor(id)).pipe(
-      map((color: ColorI) => {
+      map((color: ColorResponse) => {
         const { ...result } = color;
         return result;
       })
     )
   }
 
-  update(id: number, updateColorDto: UpdateColorDto): Observable<ColorI> {
+  update(id: number, updateColorDto: UpdateColorDto): Observable<ColorResponse> {
     return from(this.colorRepository.update(id, updateColorDto)).pipe(
       switchMap(() => this.findOne(id))
     );
