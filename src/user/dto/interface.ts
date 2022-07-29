@@ -1,8 +1,12 @@
+import { UserRole } from "../entities/user-role";
+
 export interface UserResponse {
-    id: number;
-    username: string;
-    email: string;
+    id?: number;
+    username?: string;
+    email?: string;
+    role?: UserRole;
     password?:string;
-    avatar:string | null;
+    isBlocked?:boolean | true;
+    photoUrl?:string | null;
   }
   
