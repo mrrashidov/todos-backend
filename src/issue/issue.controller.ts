@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { IssueService } from './issue.service';
 import { CreateIssueDto } from './dto/create-issue.dto';
@@ -21,8 +22,8 @@ export class IssueController {
   }
 
   @Get()
-  findAll() {
-    return this.issueService.findAll();
+  findAll(@Query('id') id: number) {
+    return this.issueService.findIssuesByProjectId(id);
   }
 
   @Get(':id')

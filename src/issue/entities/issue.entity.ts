@@ -2,7 +2,7 @@ import { Color } from 'src/color/entities/color.entity';
 import { Label } from 'src/label/entities/label.entity';
 import { Project } from 'src/project/entities/project.entity';
 import { User } from 'src/user/entities/user.entity';
- import { IssueStatus } from 'src/enum/IssueStatus';
+import { IssueStatus } from 'src/enum/IssueStatus';
 import {
   Column,
   CreateDateColumn,
@@ -16,47 +16,45 @@ import {
 import { Priority } from 'src/enum/IssuePriority.enum';
 
 @Entity()
-export class Issue { 
+export class Issue {
   @PrimaryGeneratedColumn()
-   id: number;
+  id: number;
 
-   @JoinColumn()
-   @ManyToOne(() => Issue)
-   parentIssue: Issue;
+  @JoinColumn()
+  @ManyToOne(() => Issue)
+  parentIssue: Issue;
 
-   @Column()
-   title: string;
+  @Column()
+  title: string;
 
-   @Column()
-   description: string;
+  @Column()
+  description: string;
 
-   @Column({type:'enum',enum: IssueStatus})
-   status: IssueStatus;
-   
+  @Column({ type: 'enum', enum: IssueStatus })
+  status: IssueStatus;
 
-   @Column({type:'enum',enum: Priority})
-   priority: Priority;
-   
-   @Column('timestamp with time zone')
-   dueDate: Date;
+  @Column({ type: 'enum', enum: Priority })
+  priority: Priority;
 
-   @JoinColumn()
-   @ManyToOne(() => Project)
-   project: Project;
- 
-   @ManyToOne(() => Color)
-   @JoinColumn()
-   colors: Color;
+  @Column('timestamp with time zone')
+  dueDate: Date;
 
-   @JoinColumn()
-   @ManyToOne(() => User)
-   user: User;
+  @JoinColumn()
+  @ManyToOne(() => Project, (project) => project.issue)
+  project: Project;
 
-  @CreateDateColumn({type: 'timestamp', precision: 3,  })
-   createdAt: Date;
+  @ManyToOne(() => Color)
+  @JoinColumn()
+  colors: Color;
+
+  @JoinColumn()
+  @ManyToOne(() => User)
+  user: User;
+
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  createdAt: Date;
 
   @ManyToMany(() => Label)
   @JoinTable()
-   labels: Label[];
-
+  labels: Label[];
 }
