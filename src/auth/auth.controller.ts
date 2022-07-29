@@ -3,7 +3,7 @@ import { Body, Controller, HttpCode, Post} from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 import { CreatedUserDto } from 'src/user/dto/create-user.dto';
 import { UserResponse } from 'src/user/dto/interface';
-import { LoginDto } from 'src/user/dto/update-user.dto';
+import { LoginDto } from 'src/user/dto/login-user.dto';
 import { AuthService } from './auth.service';
 
 @Controller("auth")
