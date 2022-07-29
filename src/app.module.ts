@@ -13,6 +13,8 @@ import { FavouriteModule } from './favourite/favourite.module';
 import { NotificationModule } from './notification/notification.module';
 import { CommentModule } from './comment/comment.module';
 import { UserNotificationModule } from './user-notification/user-notification.module';
+import { AuthModule } from './auth/auth.module';
+import { ConfigModule } from '@nestjs/config';
 
 
 @Module({
@@ -22,11 +24,13 @@ import { UserNotificationModule } from './user-notification/user-notification.mo
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'root123',
+      password: '1111',
       database: 'ToDo',
       autoLoadEntities:true,
       synchronize: true,
     }),
+    ConfigModule.forRoot({isGlobal: true}),
+    AuthModule,
     UserModule,
     ColorModule,
     ProjectModule,
