@@ -1,5 +1,8 @@
 import { Controller, Get, Post, Body, Param, Delete, Put, HttpCode } from '@nestjs/common';
+import { number } from 'joi';
+import { catchError, map, Observable, of } from 'rxjs';
 import { ColorService } from './color.service';
+import { ColorI } from './dto/color-interface';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
 
@@ -9,27 +12,33 @@ export class ColorController {
 
   @Post()
   @HttpCode(200)
-  create(@Body() createColorDto: CreateColorDto) {
-    return this.colorService.create(createColorDto);
+  create(@Body() createColorDto: CreateColorDto):Observable<ColorI | Object> {
+    return this.colorService.create(createColorDto).pipe(
+      map((color: ColorI)=>createColorDto),
+      catchError(err =>of({error:err.message}))
+    );
   }
 
   @Get()
-  findAll() {
+  findAll():Observable<ColorI[]> {
     return this.colorService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.colorService.findOne(+id);
+  findOne(@Param('id') id: string):Observable<ColorI> {
+    return this.colorService.findOne(Number(id));
   }
 
-  @Put()
-  update(@Body() updateColorDto: UpdateColorDto) {
-    return this.colorService.update(updateColorDto);
+  @Put(':id')
+  update(
+    @Param('id') id :string,
+    @Body() updateColorDto: UpdateColorDto):Observable<ColorI> {
+    return this.colorService.update(Number(id),updateColorDto);
   }
 
+  
   @Delete(':id')
-  remove(@Param('id') id: number) {
+  remove(@Param('id') id: string) {
     return this.colorService.remove(+id);
   }
 }

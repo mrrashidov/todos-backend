@@ -1,7 +1,8 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from} from 'rxjs';
+import { catchError, from, map, Observable, of, switchMap} from 'rxjs';
 import { Repository } from 'typeorm/repository/Repository';
+import { ColorI } from './dto/color-interface';
 import { CreateColorDto } from './dto/create-color.dto';
 import { UpdateColorDto } from './dto/update-color.dto';
 import { Color } from './entities/color.entity';
@@ -13,38 +14,48 @@ export class ColorService {
     private colorRepository: Repository<Color>
   ) { }
 
-  async create(createColorDto: CreateColorDto) {
+  create(createColorDto: CreateColorDto): Observable<ColorI> {
     const newColor = this.colorRepository.create(createColorDto);
-    await this.colorRepository.save(newColor);
-    return newColor;
+    return from(this.colorRepository.save(newColor)).pipe(
+      map((color:ColorI)=>{
+        const{...result}=color;
+        return result;
+      })      
+    );
   }
 
-  findAll() {
-    return from(this.colorRepository.find());
+  findAll(): Observable<ColorI[]> {
+    return from(this.colorRepository.find()).pipe(
+      map((colors: ColorI[]) => {
+        colors.forEach(function (v) { delete v.id });
+        return colors;
+      })
+    );
   }
 
-  async findOne(id: number) {
-    const color = await this.findColor(id);
-    if(!color){
-      throw new NotFoundException('Sorry , we dont have this color');
-    }
-    return color;
+  findOne(id: number): Observable<ColorI> {
+    return from(this.findColor(id)).pipe(
+      map((color: ColorI) => {
+        const { ...result } = color;
+        return result;
+      })
+    )
   }
 
-  async update(updateColorDto: UpdateColorDto) {
-    const color = await this.findColor(updateColorDto.id);
-    if(!color){
+  update(id: number, updateColorDto: UpdateColorDto): Observable<ColorI> {
+    return from(this.colorRepository.update(id, updateColorDto)).pipe(
+      switchMap(() => this.findOne(id))
+    );
+  }
+
+  remove(id: number) {
+    const color = this.findColor(id);
+    if (!color) {
       throw new HttpException('Sorry,we dont have this color', HttpStatus.BAD_REQUEST);
     }
-    return from(this.colorRepository.update(updateColorDto.id,updateColorDto));
-  }
-
-  async remove(id: number) {
-    const color = await this.findColor(id);
-    if(!color){
-      throw new HttpException('Sorry,we dont have this color', HttpStatus.BAD_REQUEST);
-    }
-    return from(this.colorRepository.delete({ id }));
+      return from(this.colorRepository.delete({ id })).pipe(
+        catchError(err =>of({error:err.message}))
+      )
   }
 
   async findColor(id: number): Promise<Color> {
