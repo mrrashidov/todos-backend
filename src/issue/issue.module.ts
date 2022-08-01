@@ -9,7 +9,7 @@ import { User } from 'src/user/entities/user.entity';
 import { Label } from 'src/label/entities/label.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Issue,Project,Color,User,Label])],
+  imports: [TypeOrmModule.forFeature([Issue, Project, Color, User, Label])],
   controllers: [IssueController],
   providers: [IssueService],
 })

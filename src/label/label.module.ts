@@ -6,8 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Color } from 'src/color/entities/color.entity';
 
 @Module({
-  imports:[TypeOrmModule.forFeature([Label,Color])],
+  imports: [TypeOrmModule.forFeature([Label, Color])],
   providers: [LabelService],
-  controllers: [LabelController]
+  controllers: [LabelController],
 })
 export class LabelModule {}
