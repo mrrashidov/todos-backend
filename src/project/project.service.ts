@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { from, map, Observable, switchMap } from 'rxjs';
 import { Color } from 'src/color/entities/color.entity';
 import { Team } from 'src/team/entities/team.entity';
 import { User } from 'src/user/entities/user.entity';
@@ -15,117 +16,162 @@ export class ProjectService {
     @InjectRepository(Project)
     private projectRepository: Repository<Project>,
 
-    @InjectRepository(User)    
-    private userRepository:Repository<User>,
-    
-    @InjectRepository(Color)    
-    private colorRepository:Repository<Color>,
-    
-    @InjectRepository(Team)    
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+
+    @InjectRepository(Color)
+    private colorRepository: Repository<Color>,
+
+    @InjectRepository(Team)
     private teamRepository: Repository<Team>
-  
+
   ) { }
 
-  async create(createProjectDto: CreateProjectDto) {
-    const [user, color, project] = await Promise.all([
-      this.userRepository.findOne({ where: { id: createProjectDto.userId } }),
-      this.colorRepository.findOne({ where: { id: createProjectDto.colorId } }),
-      this.projectRepository.create({
-        name: createProjectDto.name,
-        createdAt: new Date(),
-      }),
-    ]);
 
-    if (user != null && color != null) {
-      project.user = user;
-      project.color = color;
-    }
-    if (createProjectDto.parentProjectId != null) {
-      const parentProject = await this.projectRepository.findOne({
-        where: { id: createProjectDto.parentProjectId },
-      });
+  create(createProjectDto: CreateProjectDto): Observable<Project> {
+    const project = this.projectRepository.create({
+      name: createProjectDto.name,
+      createdAt: new Date(),
+    });
 
-      if (parentProject.parentProject == null) {
-        project.parentProject = parentProject;
-      }
-    } else {
-      project.parentProject = null;
-    }
-    this.projectRepository.save(project);
-
-    return project;
+    return this.findUserById(createProjectDto.userId).pipe(
+      switchMap((user: User) => {
+        if (user != null) {
+          project.user = user;
+          return this.findByColorId(createProjectDto.colorId).pipe(
+            switchMap((color: Color) => {
+              if (color != null) {
+                project.color = color;
+                if (createProjectDto.parentProjectId != null) {
+                  return this.findByProjectId(createProjectDto.parentProjectId).pipe(
+                    switchMap((prproject: Project) => {
+                      if (prproject.parentProject == null) {
+                        project.parentProject = prproject
+                        return from(this.projectRepository.save(project)).pipe(
+                          map((project: Project) => {
+                            return project;
+                          })
+                        )
+                      }
+                    }))
+                } else {
+                  return from(this.projectRepository.save(project)).pipe(
+                    map((project: Project) => {
+                      return project;
+                    }))
+                }
+              }
+            })
+          )
+        }
+      })
+    )
   }
 
-  async findAllByUserId(userId: number) {
-    const user = await this.userRepository.findOneBy({ id: userId });
-
-    if (user != null) {
-      const [teamProjects, projects] = await Promise.all([
-        this.teamRepository.query(
-          `select p.* from team join team_user_users tuu on team.id = tuu."teamId" join project p on p.id = team."projectId" where tuu."usersId" = ${user.id} `,
-        ),
-        this.projectRepository.query(
-          `select * from project  left join  team  tpp on project.id = tpp."projectId"  where project."userId" = ${user.id}  and tpp."projectId" is null and project."parentProjectId" is null and project."isDelete" = false`,
-        ),
-      ]);
-
-      return {
-        teamProjects: teamProjects,
-        userprojects: projects,
-      };
-    }
-    return "This user doesn't exist";
+  findAllByUserId(userId: number): Observable<Object> {
+    return this.findUserById(userId).pipe(
+      switchMap((user: User) => {
+        if (user != null) {
+          return this.findUserTeamProjects(user).pipe(
+            switchMap((teamProjects: Project[]) => {
+              return this.findUserOwnProjects(user).pipe(
+                map((ownProjects: Project[]) => {
+                  return {
+                    teamProjects: teamProjects,
+                    userprojects: ownProjects,
+                  };
+                })
+              )
+            })
+          )
+        }
+      })
+    )
   }
 
-  async update(projectId: number, updateProjectDto: UpdateProjectDto) {
-    const [project, color] = await Promise.all([
-      this.projectRepository.findOneBy({ id: projectId }),
-      this.colorRepository.findOne({ where: { id: updateProjectDto.colorId } }),
-    ]);
 
-    project.color = color;
-    project.name = updateProjectDto.name;
-
-    await this.projectRepository.save(project);
-    return project;
+  update(projectId: number, updateProjectDto: UpdateProjectDto): Observable<Project> {
+    return this.findByProjectId(projectId).pipe(
+      switchMap((project: Project) => {
+        project.name = updateProjectDto.name;
+        return this.findByColorId(updateProjectDto.colorId).pipe(
+          switchMap((color: Color) => {
+            project.color = color;
+            return from(this.projectRepository.save(project)).pipe(
+              map((savedProject: Project) => {
+                return savedProject;
+              })
+            )
+          })
+        )
+      })
+    )
   }
 
-  async remove(projectId: number, userId: number) {
-    const [project, team] = await Promise.all([
-      this.projectRepository.findOne({
-        where: { id: projectId },
-        relations: ['user'],
-      }),
-      this.teamRepository.findOne({
-        where: { project: { id: projectId } },
-        relations: ['user'],
-      }),
-    ]);
-    console.log(project, team);
+  remove(projectId: number, userId: number): Observable<String> {
+    return this.findByProjectId(projectId).pipe(
+      switchMap((project: Project) => {
+        return this.findTeamfromProjectId(projectId).pipe(
+          switchMap((team: Team) => {
+            if (project.user.id == userId && team == null) {
+              project.isDelete = true;
+              from(this.projectRepository.save(project)).pipe(
 
-    if (project.user.id == userId && team == null) {
-      project.isDelete = true;
-      await this.projectRepository.save(project);
-    } else if (team != null && project.user.id == userId) {
-      project.isDelete = true;
-      await Promise.all([
-        this.projectRepository.save(project),
-        this.teamRepository.remove(team),
-      ]);
-      console.log(project, team);
-    } else {
-      const user = team.user.find((obj) => {
-        return obj.id == userId;
-      });
-      console.log(user);
-      if (user != null) {
-        team.user.forEach((element, index) => {
-          if (element.id == user.id) delete team.user[index];
-        });
-        this.teamRepository.save(team);
-      }
-    }
+              )
+            } else if (team != null && project.user.id == userId) {
+              project.isDelete = true;
+              from(this.projectRepository.save(project))
+              from(this.teamRepository.remove(team))
+            } else {
+              const user = team.user.find((obj) => {
+                return obj.id == userId;
+              });
+              if (user != null) {
+                team.user.forEach((element, index) => {
+                  if (element.id == user.id) delete team.user[index];
+                });
+                from(this.teamRepository.save(team));
 
-    return 'DELETED';
+              }
+            }
+            return 'DELETED';
+          })
+        )
+      })
+    )
   }
+
+  private findByProjectId(id: number): Observable<Project> {
+    return from(this.projectRepository.findOne({ where: { id }, relations: ['user'] })
+    )
+  }
+
+  private findByColorId(id: number): Observable<Color> {
+    return from(this.colorRepository.findOneBy({ id }))
+  }
+
+  private findUserById(id: number): Observable<User> {
+    return from(this.userRepository.findOneBy({ id }))
+  }
+
+  private findUserTeamProjects(user: User): Observable<Project[]> {
+    return from(this.teamRepository.query(
+      `select p.* from team join team_user_users tuu on team.id = tuu."teamId" join project p on p.id = team."projectId" where tuu."usersId" = ${user.id} `,
+    ));
+  }
+  private findUserOwnProjects(user: User): Observable<Project[]> {
+    return from(this.teamRepository.query(
+      `select * from project  left join  team  tpp on project.id = tpp."projectId"  where project."userId" = ${user.id}  and tpp."projectId" is null and project."parentProjectId" is null and project."isDelete" = false`,
+    ));
+  }
+
+  private findTeamfromProjectId(projectId: number): Observable<Team> {
+    return from(this.teamRepository.findOne({
+      where: { project: { id: projectId } },
+      relations: ['user'],
+    }))
+  }
+
+
+  
 }

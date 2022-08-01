@@ -1,10 +1,12 @@
-import { PartialType } from '@nestjs/mapped-types';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsNotEmpty, IsString } from 'class-validator';
-import { CreateProjectDto } from './create-project.dto';
 
 export class UpdateProjectDto {
+  @ApiProperty()
+  @IsNotEmpty()
   @IsString()
   name: string;
-  @IsInt()
+ 
+  @ApiProperty()
   colorId: number;
 }
