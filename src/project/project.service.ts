@@ -6,6 +6,7 @@ import { Team } from 'src/team/entities/team.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { AllProjects } from './dto/select.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
 
@@ -68,7 +69,7 @@ export class ProjectService {
     )
   }
 
-  findAllByUserId(userId: number): Observable<Object> {
+  findAllByUserId(userId: number): Observable<AllProjects> {
     return this.findUserById(userId).pipe(
       switchMap((user: User) => {
         if (user != null) {
@@ -76,10 +77,10 @@ export class ProjectService {
             switchMap((teamProjects: Project[]) => {
               return this.findUserOwnProjects(user).pipe(
                 map((ownProjects: Project[]) => {
-                  return {
-                    teamProjects: teamProjects,
-                    userprojects: ownProjects,
-                  };
+                  let allprojects: AllProjects;
+                   allprojects.ownProjects = ownProjects
+                   allprojects.teamProjects = teamProjects;
+                  return allprojects;
                 })
               )
             })
@@ -142,7 +143,7 @@ export class ProjectService {
   }
 
   private findByProjectId(id: number): Observable<Project> {
-    return from(this.projectRepository.findOne({ where: { id }, relations: ['user'] })
+    return from(this.projectRepository.findOne({ where: { id }, relations: ['parentProject', 'user'] })
     )
   }
 
