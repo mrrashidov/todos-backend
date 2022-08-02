@@ -1,34 +1,50 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Delete,
+  Put,
+  HttpCode,
+  Query,
+} from '@nestjs/common';
 import { LabelService } from './label.service';
 import { CreateLabelDto } from './dto/create-label.dto';
 import { UpdateLabelDto } from './dto/update-label.dto';
+import { catchError, Observable, of } from 'rxjs';
+import { LabelResponse } from './dto/label-interface';
 
 @Controller('label')
 export class LabelController {
-  constructor(private readonly labelService: LabelService) {}
+  constructor(private readonly labelService: LabelService) { }
 
   @Post()
-  create(@Body() createLabelDto: CreateLabelDto) {
-    return this.labelService.create(createLabelDto);
+  @HttpCode(200)
+  create(
+    @Body() createLabel: CreateLabelDto) {
+    return this.labelService.create(createLabel)
+  }
+  @Get(':userId')
+  findAllLabel(@Query('userId') userId: number) {
+    if (userId == null) {
+      catchError((err) => of({ error: err.message }))
+    } else {
+      return this.labelService.findByUser(userId);
+    }
   }
 
-  @Get()
-  findAll() {
-    return this.labelService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.labelService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLabelDto: UpdateLabelDto) {
+  @Put()
+  update(@Query('id') id: number, @Body() updateLabelDto: UpdateLabelDto) {
     return this.labelService.update(+id, updateLabelDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
+  @Delete()
+  remove(@Query('id') id: number) {
     return this.labelService.remove(+id);
+  }
+
+  @Get()
+  findAllForAdmin(): Observable<LabelResponse[]> {
+    return this.labelService.findAllForAdmin();
   }
 }
