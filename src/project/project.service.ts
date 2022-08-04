@@ -76,12 +76,10 @@ export class ProjectService {
           return this.findUserTeamProjects(user).pipe(
             switchMap((teamProjects: Project[]) => {
               return this.findUserOwnProjects(user).pipe(
-                map((ownProjects: Project[]) => {
-                  let allprojects: AllProjects;
-                   allprojects.ownProjects = ownProjects
-                   allprojects.teamProjects = teamProjects;
-                  return allprojects;
-                })
+                map((ownProjects: Project[]) => ({
+                  team: teamProjects,
+                  own: ownProjects
+                }))
               )
             })
           )
