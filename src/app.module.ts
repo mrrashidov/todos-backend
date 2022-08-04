@@ -13,7 +13,9 @@ import { FavouriteModule } from './favourite/favourite.module';
 import { NotificationModule } from './notification/notification.module';
 import { CommentModule } from './comment/comment.module';
 import { UserNotificationModule } from './user-notification/user-notification.module';
-
+import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -24,9 +26,11 @@ import { UserNotificationModule } from './user-notification/user-notification.mo
       username: 'postgres',
       password: 'root123',
       database: 'ToDo',
-      autoLoadEntities:true,
+      autoLoadEntities: true,
       synchronize: true,
     }),
+    ConfigModule.forRoot({ isGlobal: true }),
+    AuthModule,
     UserModule,
     ColorModule,
     ProjectModule,

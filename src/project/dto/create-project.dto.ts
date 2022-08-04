@@ -1,16 +1,21 @@
-import { IsInt, IsNotEmpty, IsString } from "class-validator";
-import { Timestamp } from "typeorm";
+import { ApiProperty } from '@nestjs/swagger';
+import { IsInt, IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateProjectDto {
 
-     @IsString()
-     name: string;
-    
-     @IsInt()
-     userId: number;
- 
-     parentProjectId: number;
-     
-     colorId: number
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 
+  @ApiProperty()
+  @IsInt()
+  @IsNotEmpty()
+  userId: number;
+
+  @ApiProperty()
+  parentProjectId: number;
+
+  @ApiProperty()
+  colorId: number;
 }

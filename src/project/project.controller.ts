@@ -13,7 +13,7 @@ export class ProjectController {
   }
 
   @Get()
-  findAllByUserId(@Query('id') id ) {
+  findAllByUserId(@Query('id') id: number ) {
     return this.projectService.findAllByUserId(id);
   }
 

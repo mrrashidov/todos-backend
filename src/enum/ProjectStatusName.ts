@@ -1,5 +1,5 @@
 enum ProjectStatus {
-     ACTIVE,
-     ARCHIVE,
-     DELETE
-   }
+  ACTIVE,
+  ARCHIVE,
+  DELETE,
+}
