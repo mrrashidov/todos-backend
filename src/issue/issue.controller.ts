@@ -14,6 +14,7 @@ import { UpdateIssueDto } from './dto/update-issue.dto';
 
 @Controller('issue')
 export class IssueController {
+
   constructor(private readonly issueService: IssueService) {}
 
   @Post()
@@ -22,13 +23,14 @@ export class IssueController {
   }
 
   @Get()
-  findAll(@Query('id') id: number) {
-    return this.issueService.findIssuesByProjectId(id);
+  findAll(@Query('projectId')  projectId: number) {
+    return this.issueService.findIssuesByProjectId(projectId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.issueService.findOne(+id);
+  @Get('id')
+  findOne(@Query('id') id: number) {
+    
+    return this.issueService.findOne(id);
   }
 
   @Patch(':id')
