@@ -1,24 +1,25 @@
-import { Project } from 'src/project/entities/project.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
   Column,
   Entity,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { ModelType } from './model-type';
 
 @Entity()
 export class Favourite {
   @PrimaryGeneratedColumn()
-  private id: number;
+  id: number;
 
   @JoinColumn()
-  @ManyToOne(() => User)
-  private user: User;
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
+  user: User;
 
-  @JoinColumn()
-  @ManyToOne(() => Project)
-  private project: Project;
+  @Column()
+  modelId: number;
+
+  @Column({ type: 'enum', enum: ModelType  })
+  modelType: ModelType;
 }
