@@ -1,4 +1,3 @@
-import { type } from 'os';
 import { Color } from 'src/color/entities/color.entity';
 import { User } from 'src/user/entities/user.entity';
 import {
@@ -11,6 +10,7 @@ import {
 
 @Entity()
 export class Label {
+
   @PrimaryGeneratedColumn()
   id: number;
 

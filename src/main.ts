@@ -12,6 +12,16 @@ async function bootstrap() {
     .setTitle('Todo_ist api')
     .setDescription('Todo_ist api')
     .setVersion('1.0.0')
+    // .addBearerAuth(
+    //   {
+    //     description: 'Default JWT Authorization',
+    //     type: 'http',
+    //     in: 'header',
+    //     scheme: 'bearer',
+    //     bearerFormat: process.en/v.TOKEN_TYPE
+    //   },
+    //   'defaultBearerAuth',
+    // )
     .build();
 
   const document = SwaggerModule.createDocument(app, swaggerConfig);

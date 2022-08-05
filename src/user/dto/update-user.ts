@@ -7,5 +7,4 @@ export  class UpdateUserDto extends CreatedUserDto {
     @ApiProperty()
     @IsInt()
     id: number;
-
 }

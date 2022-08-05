@@ -1,46 +1,43 @@
-import { Color } from "src/color/entities/color.entity";
-import { User } from "src/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn, Timestamp, Tree, TreeParent } from "typeorm";
-
-
+import { Color } from 'src/color/entities/color.entity';
+import { Issue } from 'src/issue/entities/issue.entity';
+import { User } from 'src/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Project {
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @PrimaryGeneratedColumn()
-     id: number;
+  @Column()
+  name: string;
 
-    @Column()
-     name: string;
+  @JoinColumn()
+  @ManyToOne(() => User)
+  user: User;
 
-    @JoinColumn()
-    @ManyToOne(()=> User)
-     user: User;
+  @JoinColumn()
+  @ManyToOne(() => Project)
+  parentProject: Project;
 
-    
-    @JoinColumn()
-    @ManyToOne(()=>Project)
-     parentProject: Project;
-    
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  createdAt: Date;
 
-     @CreateDateColumn({ 
-        type: 'timestamp', 
-        precision: 3
-      })
-      createdAt: Date;
+  @JoinColumn()
+  @ManyToOne(() => Color)
+  color: Color;
 
-  
-    
-      @JoinColumn()
-      @ManyToOne(()=>Color)
-      color: Color
-   
-   @Column({
-    default:  false
-   })
-      isDelete: boolean
-    
+  @Column({ default: false })
+  isDelete: boolean;
 
- 
-
+  @OneToMany(() => Issue, (issue) => issue.project)
+  @JoinColumn()
+  issue: Issue[];
 }
