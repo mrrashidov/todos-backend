@@ -14,7 +14,6 @@ import { NotificationModule } from './notification/notification.module';
 import { CommentModule } from './comment/comment.module';
 import { UserNotificationModule } from './user-notification/user-notification.module';
 import { AuthModule } from './auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
@@ -24,7 +23,7 @@ import { ConfigModule } from '@nestjs/config';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'root123',
+      password: '1111',
       database: 'ToDo',
       autoLoadEntities: true,
       synchronize: true,
@@ -45,6 +44,4 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  constructor(private dataSource: typeorm.DataSource) {}
-}
+export class AppModule {}

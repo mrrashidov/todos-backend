@@ -12,18 +12,20 @@ import {
 export class Label {
 
   @PrimaryGeneratedColumn()
-   id: number;
+  id: number;
 
   @Column()
-   name: string;
+  name: string;
 
   @JoinColumn()
-  @ManyToOne(() => Color)
-   color: Color;
-  
+  @ManyToOne(() => Color, {
+    onDelete: 'SET NULL',
+  })
+  color: Color;
+
   @JoinColumn()
-  @ManyToOne(() => User)
-   user: User;
-
-
+  @ManyToOne(type=> User,user=>user.labels, {
+    onDelete: 'SET NULL',
+  })
+  user: User;
 }
