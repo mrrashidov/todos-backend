@@ -6,23 +6,22 @@ import { CreatedUserDto } from 'src/user/dto/create-user.dto';
 import { LoginDto } from 'src/user/dto/update-user.dto';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm/repository/Repository';
-import * as bcrypt from 'bcrypt'
+import * as bcrypt from 'bcrypt';
 import { UserResponse } from 'src/user/dto/interface';
 
 @Injectable()
 export class AuthService {
-
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private jwtService: JwtService
-  ) { }
+    private jwtService: JwtService,
+  ) {}
 
   register(createdUserDto: CreatedUserDto): Observable<UserResponse> {
     const userEntity = this.usersRepository.create(createdUserDto);
     return this.mailExists(userEntity.email).pipe(
       switchMap((exists: boolean) => {
-        if (!exists) {
+        if (exists) {
           return this.hashPassword(userEntity.password).pipe(
             switchMap((passwordHash: string) => {
               userEntity.password = passwordHash;
@@ -30,38 +29,46 @@ export class AuthService {
                 map((savedUser: UserResponse) => {
                   const { password, ...user } = savedUser;
                   return user;
-                })
-              )
-            })
-          )
+                }),
+              );
+            }),
+          );
         } else {
           throw new HttpException('Email already in use', HttpStatus.CONFLICT);
         }
-      })
-    )
+      }),
+    );
   }
 
   login(loginUserDto: LoginDto): Observable<string> {
     return this.findUserByEmail(loginUserDto.email.toLowerCase()).pipe(
       switchMap((user: UserResponse) => {
         if (user) {
-          return this.validatePassword(loginUserDto.password, user.password).pipe(
+          return this.validatePassword(
+            loginUserDto.password,
+            user.password,
+          ).pipe(
             switchMap((passwordsMatches: boolean) => {
               if (passwordsMatches) {
                 return this.findOne(user.id).pipe(
-                  switchMap((user: UserResponse) => this.generateJwt(user))
-                )
+                  switchMap((user: UserResponse) => this.generateJwt(user)),
+                );
               } else {
-                throw new HttpException('Login was not Successfully', HttpStatus.UNAUTHORIZED);
+                throw new HttpException(
+                  'Login was not Successfully',
+                  HttpStatus.UNAUTHORIZED,
+                );
               }
-            })
-          )
+            }),
+          );
         } else {
-          throw new HttpException('User not found, please try again.', HttpStatus.NOT_FOUND);
+          throw new HttpException(
+            'User not found, please try again.',
+            HttpStatus.NOT_FOUND,
+          );
         }
-      }
-      )
-    )
+      }),
+    );
   }
 
   findAll(): Observable<UserResponse[]> {
@@ -73,13 +80,18 @@ export class AuthService {
   }
 
   private findUserByEmail(email: string): Observable<UserResponse> {
-    return from(this.usersRepository.findOne({
-      where: { email },
-      select: ['id', 'username', 'email', 'password', 'avatar']
-    }));;
+    return from(
+      this.usersRepository.findOne({
+        where: { email },
+        select: ['id', 'username', 'email', 'password', 'avatar'],
+      }),
+    );
   }
 
-  private validatePassword(password: string, storedPasswordHash: string): Observable<boolean> {
+  private validatePassword(
+    password: string,
+    storedPasswordHash: string,
+  ): Observable<boolean> {
     return this.comparePasswords(password, storedPasswordHash);
   }
 
@@ -87,9 +99,9 @@ export class AuthService {
     email = email.toLowerCase();
     return from(this.usersRepository.findOne({ where: { email } })).pipe(
       map((user: UserResponse) => {
-        return !user
-      })
-    )
+        return !user;
+      }),
+    );
   }
 
   generateJwt(user: UserResponse): Observable<string> {
@@ -100,10 +112,10 @@ export class AuthService {
     return from<string>(bcrypt.hash(password, 12));
   }
 
-  comparePasswords(password: string, storedPasswordHash: string): Observable<any> {
+  comparePasswords(
+    password: string,
+    storedPasswordHash: string,
+  ): Observable<any> {
     return from(bcrypt.compare(password, storedPasswordHash));
   }
-
 }
-
-

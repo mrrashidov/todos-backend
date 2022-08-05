@@ -1,62 +1,60 @@
-import { Color } from "src/color/entities/color.entity";
-import { Label } from "src/label/entities/label.entity";
-import { Project } from "src/project/entities/project.entity";
-import { User } from "src/user/entities/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn} from "typeorm";
+import { Color } from 'src/color/entities/color.entity';
+import { Label } from 'src/label/entities/label.entity';
+import { Project } from 'src/project/entities/project.entity';
+import { User } from 'src/user/entities/user.entity';
+import { IssueStatus } from 'src/enum/IssueStatus';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Priority } from 'src/enum/IssuePriority.enum';
 
 @Entity()
 export class Issue {
-     @PrimaryGeneratedColumn()
-     private id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-     @JoinColumn()
-     @ManyToOne(()=>Issue)
-     private parentIssue: Issue;
+  @JoinColumn()
+  @ManyToOne(() => Issue)
+  parentIssue: Issue;
 
-     @Column()
-     private title: string
+  @Column()
+  title: string;
 
-     @Column()
-     private description: string
-    
+  @Column()
+  description: string;
 
-     @Column('text')
-     private status:  IssueStatus;
+  @Column({ type: 'enum', enum: IssueStatus })
+  status: IssueStatus;
 
-     
-     @Column('text')
-     private priority: Priority;
+  @Column({ type: 'enum', enum: Priority })
+  priority: Priority;
 
-     @CreateDateColumn({ 
-          type: 'timestamp', 
-          precision: 3
-        })
-     dueDate: Date;
+  @Column('timestamp with time zone')
+  dueDate: Date;
 
-     @JoinColumn()
-     @ManyToOne(() => Project)
-     private project: Project
+  @JoinColumn()
+  @ManyToOne(() => Project, (project) => project.issue)
+  project: Project;
 
+  @ManyToOne(() => Color)
+  @JoinColumn()
+  colors: Color;
 
-     @ManyToMany(() => Color)
-     @JoinTable()
-     private color: Color
-   
-     
-     @JoinColumn()
-     @ManyToOne(() => User)
-     private user: User;
+  @JoinColumn()
+  @ManyToOne(() => User)
+  user: User;
 
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  createdAt: Date;
 
-     @CreateDateColumn({ 
-          type: 'timestamp', 
-          precision: 3
-        })
-     private  createdAt: Date;
-
-     
-     @ManyToMany(() => Label)
-     @JoinTable()
-     private labels: Label
-
+  @ManyToMany(() => Label)
+  @JoinTable()
+  labels: Label[];
 }
