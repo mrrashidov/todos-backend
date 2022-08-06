@@ -49,6 +49,7 @@ export class UserService {
       return null;
     }
   }
+
   updateUser(updateUserDto: UpdateUserDto) {
     const exist = this.findUser(updateUserDto.id);
     if (!exist) {
