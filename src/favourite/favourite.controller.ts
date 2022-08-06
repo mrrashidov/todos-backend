@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { FavouriteService } from './favourite.service';
 import { CreateFavouriteDto } from './dto/create-favourite.dto';
-import { catchError, of } from 'rxjs';
+import { ModelType } from 'src/enum/model-type';
 
 @Controller('favourite')
 export class FavouriteController {
@@ -24,12 +24,8 @@ export class FavouriteController {
   }
 
   @Get(':userId')
-  findByUser(@Query('userId') userId: number) {
-    if (userId == null) {
-      catchError((err) => of({ error: err.message }))
-    } else {
-      return this.favouriteService.findByUser(userId);
-    }
+  findByUser(@Query('userId') userId: number, modelType: ModelType) {
+         return this.favouriteService.findFavouriteByUserId(userId,modelType);
   }
 
   @Delete(':id')

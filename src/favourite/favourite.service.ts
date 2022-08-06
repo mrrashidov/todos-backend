@@ -1,14 +1,13 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { from, Observable } from 'rxjs';
+import { from, Observable, switchMap } from 'rxjs';
 import { Label } from 'src/label/entities/label.entity';
 import { Project } from 'src/project/entities/project.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateFavouriteDto } from './dto/create-favourite.dto';
-import { FavouriteResponse } from './dto/favourite-interface';
 import { Favourite } from './entities/favourite.entity';
-import { ModelType } from './entities/model-type';
+import { ModelType } from '../enum/model-type';
 
 @Injectable()
 export class FavouriteService {
@@ -32,7 +31,7 @@ export class FavouriteService {
       this.userRepository.findOne({ where: { id: createFavouriteDto.userId } }),
       this.favouriteRepositoy.create(createFavouriteDto)
     ]);
-    if (user != undefined) {
+    if (user) {
       if (createFavouriteDto.modelType == ModelType.PROJECT) {
         const project = await this.projectRepository.findOne({ where: { id: createFavouriteDto.modelId }, relations: ['user'] })
         if (project != undefined && project.user == user) {
@@ -55,34 +54,23 @@ export class FavouriteService {
       return from(this.favouriteRepositoy.save(favourite));
     }
   }
-
-  async findByUser(userId: number) {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    if (user == null) {
-      throw new HttpException(
-        'Sorry,we dont have this user',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const favourite = this.favouriteRepositoy.query(`select f.* from favourite f join users u on u.id=f."userId"  where  "userId"=${user.id};`);
-    return favourite;
+  remove(id: number) {
+    return from(this.findFavourite(id)
+      .then((favourite: Favourite) => favourite)
+      .catch(error => error));
+  }
+  findFavouriteByUserId(userId: number, modelType: ModelType): Observable<Favourite[]> {
+    const user = this.userRepository.findOne({ where: { id: userId } });
+    return from(this.favouriteRepositoy.find({ where: { user: user as any, modelType: modelType } }));
   }
 
-
-  async remove(id: number) {
-    const label = await this.findFavourite(id);
-    if (!label) {
-      throw new HttpException(
-        'Sorry,we dont have!!!',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    return from(this.favouriteRepositoy.delete({ id }));
+  findUserById(id: number): Observable<User> {
+    return from(this.userRepository.findOneBy({ id }))
   }
 
-  async findFavourite(id: number): Promise<FavouriteResponse> {
+  async findFavourite(id: number): Promise<Favourite> {
     return this.favouriteRepositoy.findOneBy({ id })
-      .then((res: FavouriteResponse) => res)
+      .then((res: Favourite) => res)
       .catch(err => err)
   }
 }
