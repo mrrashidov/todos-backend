@@ -10,7 +10,7 @@ export class CreateLabelDto {
   @ApiProperty()
   @IsInt()
   colorId: number;
-  
+
   @ApiProperty()
   @IsInt()
   userId: number;

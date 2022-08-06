@@ -61,7 +61,7 @@ export class LabelService {
       .catch(err => err)
   }
   
-   async update(id: number, updateLabelDto: UpdateLabelDto) {
+  async update(id: number, updateLabelDto: UpdateLabelDto) {
     const current = await this.findLabel(id);
     if (!current) {
       throw new HttpException(
