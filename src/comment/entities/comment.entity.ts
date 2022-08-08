@@ -1,16 +1,32 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { ModelType } from 'src/enum/model-type';
+import { User } from 'src/user/entities/user.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn
+} from 'typeorm';
 
 @Entity()
 export class Comment {
   @PrimaryGeneratedColumn()
-  private id: number;
+  id: number;
 
   @Column()
-  private modelId: number;
+  modelId: number;
+
+  @Column({ type: 'enum', enum: ModelType })
+  modelType: ModelType;
 
   @Column()
-  private modelType: string;
+  text: string;
 
-  @Column()
-  private comment: string;
-}
+  @JoinColumn()
+  @ManyToOne(() => User, { onDelete: 'SET NULL' })
+  user: User;
+
+  @CreateDateColumn({ type: 'timestamp', precision: 3 })
+  createdAt: Date;
+ }
