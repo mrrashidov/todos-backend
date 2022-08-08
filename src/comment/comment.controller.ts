@@ -3,40 +3,47 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
+  Query,
+  UsePipes,
+  ValidationPipe,
+  ParseIntPipe,
 } from '@nestjs/common';
+import { Observable } from 'rxjs';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { Comment } from './entities/comment.entity';
 
 @Controller('comment')
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
+  @UsePipes(new ValidationPipe({ transform: true }))
+  create(@Body() createCommentDto: CreateCommentDto){
     return this.commentService.create(createCommentDto);
   }
 
-  @Get()
-  findAll() {
-    return this.commentService.findAll();
+  @Get(':issueId')
+  getAllCommentByIssueId(@Query('issueId',ParseIntPipe) issueId: string):Observable<Comment[]> {
+    return this.commentService.getAllCommentByIssueId(+issueId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
+  @Get(':projectId')
+  getALLCommentByProjectId(@Query('projectId') projectId: number):Observable<Comment[]> {
+    return this.commentService.getALLCommentByProjectId(projectId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
+  @Put(':id')
+  update(@Query('id',ParseIntPipe) id: string, @Body() updateCommentDto: UpdateCommentDto):Observable<Comment> {
     return this.commentService.update(+id, updateCommentDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id',ParseIntPipe) id: string):Observable<any> {
     return this.commentService.remove(+id);
   }
 }

@@ -3,43 +3,37 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
   Delete,
+  ValidationPipe,
+  UsePipes,
+  Query,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { FavouriteService } from './favourite.service';
 import { CreateFavouriteDto } from './dto/create-favourite.dto';
-import { UpdateFavouriteDto } from './dto/update-favourite.dto';
+import { catchError, of } from 'rxjs';
 
 @Controller('favourite')
 export class FavouriteController {
-  constructor(private readonly favouriteService: FavouriteService) {}
+  constructor(private readonly favouriteService: FavouriteService) { }
 
   @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
   create(@Body() createFavouriteDto: CreateFavouriteDto) {
     return this.favouriteService.create(createFavouriteDto);
   }
 
-  @Get()
-  findAll() {
-    return this.favouriteService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.favouriteService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFavouriteDto: UpdateFavouriteDto,
-  ) {
-    return this.favouriteService.update(+id, updateFavouriteDto);
+  @Get(':userId')
+  findByUser(@Query('userId') userId: number) {
+    if (userId == null) {
+      catchError((err) => of({ error: err.message }))
+    } else {
+      return this.favouriteService.findByUser(userId);
+    }
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Query('id', ParseIntPipe) id: number) {
     return this.favouriteService.remove(+id);
   }
 }
