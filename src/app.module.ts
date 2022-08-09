@@ -13,7 +13,6 @@ import { NotificationModule } from './notification/notification.module';
 import { CommentModule } from './comment/comment.module';
 import { UserNotificationModule } from './user-notification/user-notification.module';
 import { AuthModule } from './auth/auth.module';
-import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { MailerModule } from '@nestjs-modules/mailer';
 
@@ -24,7 +23,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'root123',
+      password: '1111',
       database: 'ToDo',
       autoLoadEntities: true,
       synchronize: true,
@@ -54,6 +53,5 @@ import { MailerModule } from '@nestjs-modules/mailer';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {
-  
-}
+export class AppModule {}
+
