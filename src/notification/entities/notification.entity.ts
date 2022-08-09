@@ -1,24 +1,23 @@
+import { ModelType } from "../../enum/ModelType";
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Notification {
+     
      @PrimaryGeneratedColumn()
-     private id: number;
+      id: number;
 
      @Column()
-     private modelId: number;
+      modelId: number;
+
+     @Column({ type: 'enum', enum: ModelType })
+      modelType: ModelType;
 
      @Column()
-     private modelType: string;
+      subject: string;
 
      @Column()
-     private action: string;
-
-     @Column()
-     private subject: string;
-
-     @Column()
-     private body: string;
+      body: string;
 
      @CreateDateColumn({
           type: 'timestamp',

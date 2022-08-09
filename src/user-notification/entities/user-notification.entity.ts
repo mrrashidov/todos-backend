@@ -1,3 +1,4 @@
+import { Notification } from "@/notification/entities/notification.entity";
 import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
@@ -5,19 +6,20 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 export class UserNotification {
 
      @PrimaryGeneratedColumn()
-     private id: number;
+      id: number;
+
+      @JoinColumn()
+      @ManyToOne(()=>Notification)
+      notification: Notification
  
-     @JoinColumn()
-     @ManyToOne(()=>User)
-     private user: User;
+      @JoinColumn()
+      @ManyToOne(()=>User)
+      user: User;
 
-     @Column()
-     private read: boolean;
+     @Column({default : false})
+      read: boolean;
 
-     @CreateDateColumn({ 
-          type: 'timestamp', 
-          precision: 3
-        })
-     private readAt: Date;
+     @CreateDateColumn({default: null})
+      readAt: Date;
 
 }

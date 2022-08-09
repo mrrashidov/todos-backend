@@ -3,7 +3,6 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as typeorm from 'typeorm';
 import { ColorModule } from './color/color.module';
 import { ProjectModule } from './project/project.module';
 import { IssueModule } from './issue/issue.module';
@@ -16,6 +15,7 @@ import { UserNotificationModule } from './user-notification/user-notification.mo
 import { AuthModule } from './auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
+import { MailerModule } from '@nestjs-modules/mailer';
 
 @Module({
   imports: [
@@ -28,6 +28,15 @@ import { ConfigModule } from '@nestjs/config';
       database: 'ToDo',
       autoLoadEntities: true,
       synchronize: true,
+    }),
+     MailerModule.forRoot({
+      transport: {
+        host: 'smtp.sendgrid.net',
+        auth: {
+          user: 'apikey',
+          pass: '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',
+        },
+      }
     }),
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
@@ -46,5 +55,5 @@ import { ConfigModule } from '@nestjs/config';
   providers: [AppService],
 })
 export class AppModule {
-  constructor(private dataSource: typeorm.DataSource) {}
+  
 }

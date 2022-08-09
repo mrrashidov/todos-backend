@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Put, ParseIntPipe } from '@nestjs/common';
 import { UserNotificationService } from './user-notification.service';
 import { CreateUserNotificationDto } from './dto/create-user-notification.dto';
 import { UpdateUserNotificationDto } from './dto/update-user-notification.dto';
@@ -12,23 +12,15 @@ export class UserNotificationController {
     return this.userNotificationService.create(createUserNotificationDto);
   }
 
-  @Get()
-  findAll() {
-    return this.userNotificationService.findAll();
-  }
-
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userNotificationService.findOne(+id);
+  findOne(@Query('id', ParseIntPipe) id: number) {
+    return this.userNotificationService.findAllByUserId(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserNotificationDto: UpdateUserNotificationDto) {
-    return this.userNotificationService.update(+id, updateUserNotificationDto);
+  @Put(':id')
+  isRead(@Query('id',ParseIntPipe) id: number, @Body() updateUserNotificationDto: UpdateUserNotificationDto) {
+    return this.userNotificationService.update(id, updateUserNotificationDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userNotificationService.remove(+id);
-  }
+  
 }
